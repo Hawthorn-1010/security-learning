@@ -1,6 +1,7 @@
 package com.hzy;
 
 import com.hzy.domain.User;
+import com.hzy.mapper.MenuMapper;
 import com.hzy.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ class ApplicationTests {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private MenuMapper menuMapper;
 
     @Test
     void contextLoads() {
@@ -38,5 +42,11 @@ class ApplicationTests {
     void testUserMapper() {
         List<User> users = userMapper.selectList(null);
         System.out.println(users);
+    }
+
+    @Test
+    void testMenuMapper() {
+        List<String> permissions = menuMapper.selectPermissionsByUserId(1L);
+        System.out.println(permissions);
     }
 }

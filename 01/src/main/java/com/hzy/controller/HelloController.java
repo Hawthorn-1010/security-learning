@@ -1,5 +1,6 @@
 package com.hzy.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HelloController {
 
+    @PreAuthorize("@ex.hasAuthority('system:test:list')")
     @RequestMapping("/hello")
     public String Hello() {
         return "hello";

@@ -4,6 +4,7 @@ import com.hzy.domain.ResponseResult;
 import com.hzy.domain.User;
 import com.hzy.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,5 +25,11 @@ public class LoginController {
     public ResponseResult login(@RequestBody User user) {
 
         return loginService.login(user);
+    }
+
+    @PostMapping("/user/logout")
+    public ResponseResult logout() {
+
+        return loginService.logout();
     }
 }

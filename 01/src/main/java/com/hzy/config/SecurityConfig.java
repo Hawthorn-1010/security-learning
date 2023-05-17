@@ -1,8 +1,13 @@
 package com.hzy.config;
 
+import com.hzy.filter.JwtAuthenticationTokenFilter;
+import com.hzy.handler.AccessDeniedHandlerPointImpl;
+import com.hzy.handler.AuthenticationEntryPointImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * Description:
  */
 @Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
@@ -27,6 +33,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Autowired
+    private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+
+    @Autowired
+    private AuthenticationEntryPointImpl authenticationEntryPoint;
+
+    @Autowired
+    private AccessDeniedHandlerPointImpl accessDeniedHandler;
 
     @Bean
     @Override
@@ -45,20 +60,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 // 对于登录接口 允许匿名访问 放行接口
+//                .antMatchers("/hello").permitAll()
+                // 只有没登录的才能访问，已经登陆的会403
                 .antMatchers("/user/login").anonymous()
                 .antMatchers("/testConfig").hasAuthority("system:test:list")
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated();
 
-//        // 配置过滤器
-//        http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
-//
-//
-//        // 配置异常处理器
-//        http.exceptionHandling()
-//                .authenticationEntryPoint(authenticationEntryPoint)  // 认证失败处理器
-//                .accessDeniedHandler(accessDeniedHandler);           // 授权失败处理器
 
+        // 配置异常处理器
+        http.exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint)  // 认证失败处理器
+                .accessDeniedHandler(accessDeniedHandler);           // 授权失败处理器
+        // 配置过滤器
+        http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         // 允许跨域
         http.cors();
